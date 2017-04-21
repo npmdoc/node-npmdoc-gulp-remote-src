@@ -1,0 +1,165 @@
+<html><head></head><body><div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a href="https://github.com/ddliu/gulp-remote-src">gulp-remote-src (v0.4.2)</a>
+</h1>
+<h4>Remote gulp.src</h4>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.gulp-remote-src">module gulp-remote-src</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.gulp-remote-src.gulp-remote-src">
+            function <span class="apidocSignatureSpan"></span>gulp-remote-src
+            <span class="apidocSignatureSpan">(urls, options)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.gulp-remote-src" id="apidoc.module.gulp-remote-src">module gulp-remote-src</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.gulp-remote-src.gulp-remote-src" id="apidoc.element.gulp-remote-src.gulp-remote-src">
+        function <span class="apidocSignatureSpan"></span>gulp-remote-src
+        <span class="apidocSignatureSpan">(urls, options)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">gulp-remote-src = function (urls, options) {
+    if (options === undefined) {
+        options = {};
+    }
+
+    if (typeof options.base !== 'string' ) {
+        options.base = '/';
+    }
+
+    if (typeof options.buffer !== 'boolean') {
+        options.buffer = true;
+    }
+
+    if (!util.isArray(urls)) {
+        urls = [urls];
+    }
+
+    var allowedRequestOptions = ['qs', 'headers', 'auth', 'followRedirect', 'followAllRedirects', 'maxRedirects', 'timeout', 'proxy
+',
+        'strictSSL', 'aws', 'gzip']
+
+    var requestBaseOptions = {};
+    for (var i = allowedRequestOptions.length - 1; i &gt;= 0; i--) {
+        var k = allowedRequestOptions[i];
+        if (k in options) {
+            requestBaseOptions[k] = options[k];
+        }
+    }
+
+    if (options.requestOptions) {
+        for (var k in options.requestOptions) {
+            requestBaseOptions[k] = options.requestOptions[k];
+        }
+    }
+
+    return es.readArray(urls).pipe(es.map(function(data, cb) {
+        var url = options.base + data, requestOptions = extend({url: url}, requestBaseOptions);
+
+        if (!options.buffer) {
+            var file = new File({
+                cwd: '/',
+                base: options.base,
+                path: url,
+                // request must be piped out once created, or we'll get this error: "You cannot pipe after data has been emitted
+ from the response."
+                contents: request(requestOptions).pipe(through2())
+            });
+
+            cb(null, file);
+        } else {
+            // set encoding to `null` to return the body as buffer
+            requestOptions.encoding = null;
+
+            request(requestOptions, function(error, response, body) {
+                if (!error &amp;&amp; (response.statusCode &gt;= 200 &amp;&amp; response.statusCode &lt; 300)) {
+                    var file = new File({
+                        cwd: '/',
+                        base: options.base,
+                        path: url,
+                        contents: body
+                    });
+                    cb(null, file);
+                } else {
+                    if (!error) {
+                        error = new Error("Request " + url + " failed with status code:" + response.statusCode);
+                    }
+                    cb(error);
+                }
+            });
+        }
+    }));
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
+</body></html>
